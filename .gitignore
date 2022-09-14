@@ -110,6 +110,7 @@ ENV/
 env.bak/
 venv.bak/
 bin/
+pyvenv.cfg
 
 # Spyder project settings
 .spyderproject
@@ -130,5 +131,12 @@ dmypy.json
 .pyre/
 
 # CUSTOM
+include/
+bin/
+share/
+lib64/
+lib/
+__pycache__/
+pyvenv.cfg
 __init__.py
 .__init__.cpython-38.pyc
