@@ -8,19 +8,13 @@ import base64
 
 # setting env variables
 from decouple import config
-
+from django.core.exceptions import ValidationError
 
 class ProcessReport():
     '''
-    РЕЗУЛЬТАТИ ЗАПИСУ
-    May - 2911.680125 sec - 48 mins
-    April - 2820.479611 sec - 47 mins
-    January = 2908.056534 - 48.47 mins
-    11 days - 1118.674852 sec - 18.3 mins
-
     (1) iso_date = "2022-12-31 23:59:58" string
-    datetime.strptime(iso_date, "%Y-%m-%d")- converts from str with pattern
-    "yyyy-mm-dd" to datetime obj
+    datetime.strptime(iso_date, "%Y-%m-%d") - converts str to datetime obj
+    with pattern "yyyy-mm-dd" 
     (2) datetime_obj = datetime(2022, 12, 31) dt object
     datetime.strftime(datetime_obj, "%Y-%m-%d") - converts a datetime object
     to a string with preset pattern
@@ -31,12 +25,13 @@ class ProcessReport():
     # ISO format
     iso_format = "%Y-%m-%d"
 
-    # adjust to get another report
-    url = config('KENYA_REPORT_URL')
-    # adjust dates
+    # adjust to get another report (put your report url here)
+    url = config('REPORT_LOCALHOST_URL')
+    # adjust datesgit branch
     start_date = "2022-01-01"
-    end_date = "2022-01-02"
+    end_date = "2022-01-31"
 
+    # adjust to get valid token (put your token report url here)
     token_url = config('TOKEN_URL')
     login = config('LOGIN')
     password = config('PASSWORD')
@@ -84,10 +79,10 @@ class ProcessReport():
             # print(access_token)
             return access_token
         else:
-            raise Exception("Invalid credentials. Token hasn\'t been obtained")
+            raise ValidationError("Invalid credentials. Token hasn\'t been obtained")
 
     def generate_date_list(self, start_date=None, end_date=None):
-        # Convert the string into a datetime object
+        # converts a string into a datetime object
         to_date = lambda datetime: datetime.strftime(self.iso_format)
         start = datetime.strptime(start_date, self.iso_format)
         end = datetime.strptime(end_date, self.iso_format)
@@ -141,8 +136,8 @@ class ProcessReport():
         print(date_list)
         # sends request to endpoint through the list comprehension for each date
         [
-            requests.request("GET", self.url, headers=headers, params={"LoadDate": date})
-            for date in date_list
+           requests.request("GET", self.url, headers=headers, params={"LoadDate": date})
+           for date in date_list
         ]
         end_time = datetime.now()
 
@@ -159,7 +154,7 @@ class ProcessReport():
 if __name__ == "__main__":
     print("-------------------------------------Start-------------------------------------")
     instance = ProcessReport()
-    print(instance.get_token())
+    # print(instance.get_token())
     instance.get_response()
 
     print(f"{instance.latency} sec")

@@ -4,3 +4,4 @@ idna==3.4
 python-decouple==3.6
 requests==2.28.1
 urllib3==1.26.12
+openerp-client-lib==1.1.2

@@ -15,6 +15,5 @@ pip freeze
 # create your environment
 python-decouple==3.6 - is installed from requirements (pip install python-decouple)
 sudo touch .env
-put variables inot your .env file
+put variables into your .env file
 like here: http://joxi.net/V2VPRbGiG7ZKjr
-
