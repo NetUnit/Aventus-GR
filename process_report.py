@@ -27,7 +27,7 @@ class ProcessReport():
 
     # adjust to get another report (put your report url here)
     url = config('REPORT_LOCALHOST_URL')
-    # adjust datesgit branch
+    # adjust dates
     start_date = "2022-01-01"
     end_date = "2022-01-31"
 
