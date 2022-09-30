@@ -32,7 +32,7 @@ class ProcessReport():
     end_date = "2022-01-31"
 
     # adjust to get valid token (put your token report url here)
-    token_url = config('TOKEN_URL')
+    token_url = config('KE_TOKEN_URL')
     login = config('LOGIN')
     password = config('PASSWORD')
 
@@ -135,10 +135,17 @@ class ProcessReport():
         date_list = self.generate_date_list(self.start_date, self.end_date)
         print(date_list)
         # sends request to endpoint through the list comprehension for each date
-        [
+        responses = [
            requests.request("GET", self.url, headers=headers, params={"LoadDate": date})
            for date in date_list
         ]
+
+        # check response status
+        if not len(responses) == 0:
+            random_resp = responses[0]
+            print(f"Response status: {random_resp.status_code}")
+
+        
         end_time = datetime.now()
 
         random_dt = datetime.strptime(date_list[0], self.iso_format)
@@ -154,7 +161,7 @@ class ProcessReport():
 if __name__ == "__main__":
     print("-------------------------------------Start-------------------------------------")
     instance = ProcessReport()
-    # print(instance.get_token())
+    print(instance.get_token())
     instance.get_response()
 
     print(f"{instance.latency} sec")
