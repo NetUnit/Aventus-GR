@@ -20,24 +20,32 @@ class ProcessReport():
     to a string with preset pattern
     '''
 
+    auth_header = {'Authorization': None}
+    params = {"LoadDate": None, "Days": None}
+
     # time converter --> to date yyyy-mm-dd
     to_date = lambda datetime: datetime.strftime("%Y-%m-%d")
+    
     # ISO format
     iso_format = "%Y-%m-%d"
 
     # adjust to get another report (put your report url here)
-    url = config('REPORT_LOCALHOST_URL')
+    # url = config('LK_DIRECT_COMMUNICATIONS')
+    url = config('KE_CLIENTS_W')
+
     # adjust dates
-    start_date = "2022-01-01"
-    end_date = "2022-01-31"
+    start_date = "2021-09-29"
+    end_date = "2021-10-30"
 
     # adjust to get valid token (put your token report url here)
     token_url = config('KE_TOKEN_URL')
-    login = config('LOGIN')
+    login = config('LOGIN_KE')
     password = config('PASSWORD')
 
     latency = None
     latency_data = dict()
+
+    days = 1
 
     def get_month_from_num(self, month_num):
         datetime_object = datetime.strptime(str(month_num), "%m")
@@ -50,6 +58,7 @@ class ProcessReport():
     def save_latency_data(self, month, latency):
         self.latency_data[month] = latency
         return self
+
 
     def get_token(self, token_url=None, login=None, password=None):
 
@@ -125,7 +134,7 @@ class ProcessReport():
         ]
         return date_list
 
-    def get_response(self):
+    def get_response_by_load_date(self):
         start_time = datetime.now()
 
         headers = {
@@ -153,16 +162,49 @@ class ProcessReport():
         month = self.get_month_from_num(month)
 
         latency = (end_time - start_time).total_seconds()
+
         if latency is not None:
             self.latency = latency
             self.save_latency_data(month, latency)
+
+
+    def get_response_by_load_date_and_timedelta_days(self):
+        start_time = datetime.now()
+        self.auth_header['Authorization'] = "Bearer " + self.get_token()
+        date_list = self.generate_date_list(self.start_date, self.end_date)
+        print(date_list)
+
+
+        responses = [
+           requests.request("GET", self.url, headers=self.auth_header,  params={"LoadDate": date, "Days": self.days})
+           for date in date_list
+        ]
+
+        # check response status
+        if not len(responses) == 0:
+            random_resp = responses[0]
+            print(f"Response status: {random_resp.status_code}")
+
+        end_time = datetime.now()
+
+        random_dt = datetime.strptime(date_list[0], self.iso_format)
+        month = random_dt.month
+        month = self.get_month_from_num(month)
+
+        latency = (end_time - start_time).total_seconds()
+
+        if latency is not None:
+            self.latency = latency
+            self.save_latency_data(month, latency)
+
 
 
 if __name__ == "__main__":
     print("-------------------------------------Start-------------------------------------")
     instance = ProcessReport()
     print(instance.get_token())
-    instance.get_response()
+    # instance.get_response_by_load_date()
+    instance.get_response_by_load_date_and_timedelta_days()
 
     print(f"{instance.latency} sec")
     print(instance.latency_data)
